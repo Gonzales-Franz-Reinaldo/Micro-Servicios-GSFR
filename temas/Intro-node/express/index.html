@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción a la Inteligencia Artificial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .cta-button {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .cta-button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: slideInUp 1s ease 1s forwards;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ai-animation {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            border: 4px solid #667eea;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 2s ease;
+        }
+
+        .interactive-demo {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .demo-button {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .demo-result {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: white;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .content { padding: 20px; }
+            .cards-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Inteligencia Artificial</h1>
+            <p class="subtitle">Descubre el futuro de la tecnología</p>
+            <button class="cta-button" onclick="scrollToContent()">Explorar IA</button>
+        </header>
+
+        <div class="content" id="main-content">
+            <div class="section">
+                <h2>¿Qué es la Inteligencia Artificial?</h2>
+                <p>
+                    La Inteligencia Artificial (IA) es una rama de la informática que se dedica a crear sistemas 
+                    capaces de realizar tareas que normalmente requieren inteligencia humana. Estos sistemas pueden 
+                    aprender, razonar, percibir, y tomar decisiones de manera autónoma.
+                </p>
+                <div class="ai-animation"></div>
+                <p>
+                    La IA está transformando industrias completas, desde la medicina hasta el transporte, 
+                    pasando por la educación y el entretenimiento. Su capacidad para procesar grandes 
+                    cantidades de datos y encontrar patrones complejos la convierte en una herramienta 
+                    poderosa para resolver problemas del mundo real.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>Tipos de Inteligencia Artificial</h2>
+                <div class="cards-container" id="cards-container">
+                    <div class="card">
+                        <h3>🧠 IA Débil</h3>
+                        <p>Especializada en tareas específicas como reconocimiento de voz o recomendaciones.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🚀 IA Fuerte</h3>
+                        <p>Capaz de realizar cualquier tarea intelectual que un humano puede hacer.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔮 Superinteligencia</h3>
+                        <p>Supera la inteligencia humana en todos los aspectos (teórica).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Aplicaciones Actuales</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <p>
+                    <strong>Asistentes Virtuales:</strong> Siri, Alexa, Google Assistant<br>
+                    <strong>Medicina:</strong> Diagnóstico por imágenes, descubrimiento de fármacos<br>
+                    <strong>Transporte:</strong> Vehículos autónomos, optimización de rutas<br>
+                    <strong>Finanzas:</strong> Detección de fraudes, trading algorítmico<br>
+                    <strong>Entretenimiento:</strong> Recomendaciones personalizadas, generación de contenido
+                </p>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Demo Interactivo</h3>
+                <p>Experimenta con diferentes tipos de IA:</p>
+                <button class="demo-button" onclick="simulateAI('chatbot')">Chatbot</button>
+                <button class="demo-button" onclick="simulateAI('vision')">Visión Artificial</button>
+                <button class="demo-button" onclick="simulateAI('prediction')">Predicción</button>
+                <div class="demo-result" id="demo-result">
+                    Selecciona una opción para ver la IA en acción
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>El Futuro de la IA</h2>
+                <p>
+                    El futuro de la IA promete avances revolucionarios en múltiples campos. Desde la 
+                    automatización de trabajos complejos hasta la solución de problemas globales como 
+                    el cambio climático y las enfermedades. Sin embargo, también plantea desafíos 
+                    éticos y sociales que debemos abordar cuidadosamente.
+                </p>
+                <p>
+                    La clave está en desarrollar una IA responsable, transparente y beneficiosa para 
+                    toda la humanidad. El diálogo entre tecnólogos, legisladores y la sociedad civil 
+                    será fundamental para navegar este futuro prometedor.
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 - Introducción a la Inteligencia Artificial</p>
+            <p class="pulse">🚀 El futuro es ahora</p>
+        </footer>
+    </div>
+
+    <script>
+        // Función para scroll suave al contenido
+        function scrollToContent() {
+            document.getElementById('main-content').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Animación de las tarjetas al hacer scroll
+        function animateCards() {
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 200);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            cards.forEach(card => observer.observe(card));
+        }
+
+        // Barra de progreso animada
+        function animateProgress() {
+            const progressBar = document.getElementById('progress');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        progressBar.style.width = '85%';
+                    }
+                });
+            });
+
+            observer.observe(progressBar);
+        }
+
+        // Simulador de IA interactivo
+        function simulateAI(type) {
+            const resultDiv = document.getElementById('demo-result');
+            resultDiv.innerHTML = '<div class="ai-animation"></div><p>Procesando...</p>';
+
+            setTimeout(() => {
+                let response = '';
+                switch(type) {
+                    case 'chatbot':
+                        response = '🤖 ¡Hola! Soy un chatbot de IA. ¿En qué puedo ayudarte hoy?';
+                        break;
+                    case 'vision':
+                        response = '👁️ Analizando imagen... Detectado: 1 persona, 2 objetos, escena interior';
+                        break;
+                    case 'prediction':
+                        response = '📊 Predicción: 87% probabilidad de lluvia mañana basado en datos meteorológicos';
+                        break;
+                    default:
+                        response = '🔍 Procesamiento completado';
+                }
+                resultDiv.innerHTML = `<p><strong>${response}</strong></p>`;
+            }, 2000);
+        }
+
+        // Efectos de partículas de fondo
+        function createParticles() {
+            const particlesCount = 50;
+            const body = document.body;
+
+            for (let i = 0; i < particlesCount; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 3px;
+                    height: 3px;
+                    background: rgba(255, 255, 255, 0.5);
+                    border-radius: 50%;
+                    top: ${Math.random() * 100}vh;
+                    left: ${Math.random() * 100}vw;
+                    animation: float ${5 + Math.random() * 10}s ease-in-out infinite;
+                    z-index: -1;
+                `;
+                body.appendChild(particle);
+            }
+        }
+
+        // Agregar CSS para partículas flotantes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Contador de palabras con efecto typewriter
+        function typeWriter(text, element, speed = 50) {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Inicialización cuando se carga la página
+        window.addEventListener('load', () => {
+            animateCards();
+            animateProgress();
+            createParticles();
+            
+            // Efecto de escritura en el subtítulo
+            const subtitle = document.querySelector('.subtitle');
+            const originalText = subtitle.textContent;
+            subtitle.textContent = '';
+            setTimeout(() => {
+                typeWriter(originalText, subtitle, 100);
+            }, 1000);
+        });
+
+        // Efectos de hover en elementos interactivos
+        document.addEventListener('DOMContentLoaded', () => {
+            const interactiveElements = document.querySelectorAll('.cta-button, .demo-button');
+            
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    element.style.transform = 'scale(1.05)';
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    element.style.transform = 'scale(1)';
+                });
+            });
+        });
+
+        // Función para cambiar tema (bonus)
+        let isDarkMode = false;
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.style.filter = isDarkMode ? 'invert(1) hue-rotate(180deg)' : 'none';
+        }
+
+        // Agregar botón de tema (se puede activar con doble clic en el título)
+        document.querySelector('h1').addEventListener('dblclick', toggleTheme);
+    </script>
+</body>
+</html>
