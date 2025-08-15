@@ -5,3 +5,6 @@ tareas/Tarea1-CRUD-Agenda/1-AgendaCrud-Driver/.env
 tareas/Tarea1-CRUD-Agenda/2-AgendaCrud-TypeORM/node_modules
 tareas/Tarea1-CRUD-Agenda/2-AgendaCrud-TypeORM/package-lock.json
 tareas/Tarea1-CRUD-Agenda/2-AgendaCrud-TypeORM/.env
+
+tareas/tarea2-crud-mongodb/node_modules
+tareas/tarea2-crud-mongodb/.env

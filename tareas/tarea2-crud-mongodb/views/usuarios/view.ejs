@@ -1,0 +1,50 @@
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6"><%= title %></h2>
+
+    <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm font-medium text-gray-500">Nombres</p>
+                <p class="text-lg text-gray-900"><%= usuario.nombres %></p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm font-medium text-gray-500">Apellidos</p>
+                <p class="text-lg text-gray-900"><%= usuario.apellidos %></p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm font-medium text-gray-500">Edad</p>
+                <p class="text-lg text-gray-900"><%= usuario.edad %></p>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm font-medium text-gray-500">Fecha de Nacimiento</p>
+            <p class="text-lg text-gray-900"><%= new Date(usuario.fecha_nacimiento).toISOString().split('T')[0] %></p>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm font-medium text-gray-500">Dirección</p>
+            <p class="text-lg text-gray-900"><%= usuario.direccion %></p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm font-medium text-gray-500">Celular</p>
+                <p class="text-lg text-gray-900"><%= usuario.celular %></p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm font-medium text-gray-500">Correo</p>
+                <p class="text-lg text-gray-900"><%= usuario.correo %></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex space-x-4 mt-6">
+        <a href="/usuarios/edit/<%= usuario.id %>" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded transition duration-200">
+            Editar
+        </a>
+        <a href="/usuarios" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-200">
+            Volver a la lista
+        </a>
+    </div>
+</div>
