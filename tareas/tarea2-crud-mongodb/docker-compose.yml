@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Servicio de MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: crud_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: db_agenda
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - crud-network
+
+  # Servicio de la aplicación Node.js
+  app:
+    build: .
+    container_name: crud_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://mongodb:27017/db_agenda
+      - PORT=3000
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - crud-network
+    command: npm run dev
+
+# Volúmenes para persistencia de datos
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+# Red personalizada
+networks:
+  crud-network:
+    driver: bridge
