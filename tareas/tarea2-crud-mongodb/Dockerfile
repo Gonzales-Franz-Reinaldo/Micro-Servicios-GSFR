@@ -1,6 +1,5 @@
 FROM node:22-alpine
 
-# Establecer el directorio de trabajo
 WORKDIR /app
 
 # Copiar archivos de dependencias
@@ -18,5 +17,5 @@ RUN mkdir -p public
 # Exponer el puerto
 EXPOSE 3000
 
-# Comando para iniciar la aplicación
-CMD ["npm", "run", "dev"]
+# Comando para iniciar la aplicación en docker
+CMD ["npm", "start"]

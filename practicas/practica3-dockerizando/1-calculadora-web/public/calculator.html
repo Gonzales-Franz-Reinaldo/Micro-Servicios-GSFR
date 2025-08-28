@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Calculadora Web</h1>
+        
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="valueA">Valor A:</label>
+                <input type="number" id="valueA" name="valueA" step="any" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="valueB">Valor B:</label>
+                <input type="number" id="valueB" name="valueB" step="any" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Operación:</label>
+                <div class="operation-buttons">
+                    <button type="button" class="operation-btn" data-operation="suma">Sumar (+)</button>
+                    <button type="button" class="operation-btn" data-operation="resta">Restar (-)</button>
+                    <button type="button" class="operation-btn" data-operation="multiplicacion">Multiplicar (×)</button>
+                    <button type="button" class="operation-btn" data-operation="division">Dividir (÷)</button>
+                </div>
+            </div>
+            
+            <button type="submit" id="calculateBtn" class="calculate-btn" disabled>Calcular</button>
+        </form>
+        
+        <div id="result" class="result-container">
+            <p>Selecciona una operación y presiona calcular</p>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

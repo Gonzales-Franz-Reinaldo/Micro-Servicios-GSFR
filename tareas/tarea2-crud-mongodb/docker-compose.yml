@@ -24,17 +24,16 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URL=mongodb://mongodb:27017/db_agenda
       - PORT=3000
     depends_on:
       - mongodb
     volumes:
       - .:/app
-      - /app/node_modules
     networks:
       - crud-network
-    command: npm run dev
+    command: npm start
 
 # Volúmenes para persistencia de datos
 volumes:

@@ -1,0 +1,26 @@
+<% layout('layouts/main') %>
+    <h1 class="text-2xl font-bold mb-4">Lista de Tareas</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% tareas.forEach(tarea=> { %>
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-lg font-semibold">
+                    <%= tarea.titulo %>
+                </h2>
+                <p class="text-gray-600">
+                    <%= tarea.descripcion %>
+                </p>
+                <p class="text-sm text-gray-500">Estado: <%= tarea.estado %>
+                </p>
+                <p class="text-sm text-gray-500">Creado: <%= tarea.fechaCreacion.toLocaleDateString() %>
+                </p>
+                <div class="mt-4 flex space-x-2">
+                    <a href="/tareas/<%= tarea._id %>" class="bg-blue-500 text-white px-3 py-1 rounded">Ver</a>
+                    <a href="/tareas/<%= tarea._id %>/editar"
+                        class="bg-yellow-500 text-white px-3 py-1 rounded">Editar</a>
+                    <form action="/tareas/<%= tarea._id %>?_method=DELETE" method="POST">
+                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+            <% }) %>
+    </div>
