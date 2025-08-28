@@ -1,5 +1,6 @@
 let selectedOperation = null;
 
+// Esperar a que el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', function() {
     const operacionButtons = document.querySelectorAll('.operation-btn');
     const calculateBtn = document.getElementById('calculateBtn');

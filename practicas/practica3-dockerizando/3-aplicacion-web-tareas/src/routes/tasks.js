@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
 
+
 router.get('/', taskController.obtenerTareas);
 router.get('/nueva', taskController.formularioCrearTarea);
 router.post('/', taskController.crearTarea);

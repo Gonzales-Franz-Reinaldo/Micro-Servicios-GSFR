@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const tareaSchema = new mongoose.Schema({
     titulo: {
         type: String,

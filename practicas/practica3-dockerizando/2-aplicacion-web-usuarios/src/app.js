@@ -1,43 +1,48 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import { AppDataSource } from "./config/database.js";
-import userRoutes from "./routes/userRoutes.js";
-import dotenv from "dotenv";
-import  bodyParser  from "body-parser";
-import expressEjsLayouts  from "express-ejs-layouts";
-
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const path = require('path');
+const userRoutes = require('./routes/userRoutes');
+const { initializeDatabase } = require('./config/database');
+const expressEjsLayouts = require('express-ejs-layouts');
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
-
-// Configuración de EJS
-app.use(expressEjsLayouts);
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "../views"));
-app.set('layout', 'layouts/main');
 
 // Middleware
-app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(expressEjsLayouts);
+app.use(express.static(path.join(__dirname, '../public')));
 
-// Rutas
-app.use("/", userRoutes);
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../views'));
+app.set('layout', 'layouts/main');
 
-// Inicializar TypeORM
-AppDataSource.initialize()
-    .then(() => {
-        console.log("Conectado a MySQL con TypeORM");
-        app.listen(port, () => {
-            console.log(`Servidor corriendo en http://localhost:${port}`);
+// Routes
+app.get('/', (req, res) => {
+    res.redirect('/users');
+});
+
+app.use('/users', userRoutes);
+
+// Error handling
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
+// Initialize database and start server
+const PORT = process.env.PORT || 3000;
+async function startServer() {
+    try {
+        await initializeDatabase();
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Server running on http://localhost:${PORT}`);
         });
-    })
-    .catch((err) => {
-        console.error("Error conectando a la DB:", err);
+    } catch (error) {
+        console.error('Failed to start server:', error);
         process.exit(1);
-    });
+    }
+}
+
+startServer();

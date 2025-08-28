@@ -94,9 +94,11 @@ input[type="number"]:focus {
     margin-top: 10px;
 }
 
+
 .calculate-btn:hover:not(:disabled) {
     background: #5a6fd8;
 }
+
 
 .calculate-btn:disabled {
     background: #ccc;

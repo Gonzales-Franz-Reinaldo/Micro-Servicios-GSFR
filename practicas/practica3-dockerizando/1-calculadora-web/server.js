@@ -54,6 +54,7 @@ app.post('/calculate', (req, res) => {
     res.json({ result: result });
 });
 
+
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en el puerto ${PORT}`);
     console.log(`Accede a la aplicación en: http://localhost:${PORT}`);

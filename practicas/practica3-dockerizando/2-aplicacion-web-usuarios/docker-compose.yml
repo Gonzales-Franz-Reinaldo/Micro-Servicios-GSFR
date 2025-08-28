@@ -2,34 +2,43 @@ version: "3.8"
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db_agenda
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: gonzalesRoot
+      MYSQL_DATABASE: db_usuarios
+      MYSQL_USER: gonzales
+      MYSQL_PASSWORD: gonzales123
+    # ports:
+    #   - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - app-network
 
   app:
     build: .
     depends_on:
       - db
     environment:
-      DB_HOST: db
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: db_agenda
-      DB_PORT: 3306
+      DATABASE_HOST: db
+      DATABASE_USER: gonzales
+      DATABASE_PASSWORD: gonzales123
+      DATABASE_NAME: db_usuarios
       PORT: 3000
     ports:
       - "3000:3000"
     volumes:
       - .:/app
-    command: npm start
+      - /app/node_modules
+    networks:
+      - app-network
+    # command: npm start
+    command: sh -c "npx wait-port db:3306 && npm start"
 
 volumes:
   db_data:
+
+networks:
+  app-network:
+    driver: bridge

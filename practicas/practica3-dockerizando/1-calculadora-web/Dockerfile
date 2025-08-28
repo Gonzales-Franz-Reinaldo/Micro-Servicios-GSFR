@@ -11,7 +11,7 @@ RUN npm install
 # Copiar el resto de los archivos de la aplicación
 COPY . .
 
-RUN mkdir -p public
+RUN mkdir -p public # Crear el directorio público
 
 EXPOSE 8080
 

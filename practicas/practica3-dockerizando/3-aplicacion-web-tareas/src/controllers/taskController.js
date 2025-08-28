@@ -10,6 +10,7 @@ exports.obtenerTareas = async (req, res) => {
     }
 };
 
+
 // Mostrar formulario para crear tarea
 exports.formularioCrearTarea = (req, res) => {
     res.render('tasks/create');
@@ -26,6 +27,7 @@ exports.crearTarea = async (req, res) => {
         res.status(500).send('Error al crear tarea');
     }
 };
+
 
 // Mostrar una tarea
 exports.obtenerTarea = async (req, res) => {
