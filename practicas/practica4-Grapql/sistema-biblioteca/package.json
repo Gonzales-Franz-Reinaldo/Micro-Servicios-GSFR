@@ -1,12 +1,23 @@
 {
-  "name": "sistema-biblioteca",
+  "name": "library-graphql-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "GraphQL practice for library system",
+  "main": "src/server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "graphql": "^16.8.1",
+    "mysql2": "^3.9.7",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
