@@ -1,12 +1,38 @@
 {
-  "name": "tarea4-restful",
+  "name": "sistema-ventas-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API RESTful para sistema de ventas con Node.js, Express y TypeORM",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "docker:up": "cd docker && docker-compose up -d",
+    "docker:down": "cd docker && docker-compose down"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "nodejs",
+    "express",
+    "typeorm",
+    "mysql",
+    "swagger",
+    "restful-api"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0",
+    "typeorm": "^0.3.26",
+    "mysql2": "^3.14.4",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.2",
+    "joi": "^18.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }
