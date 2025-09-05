@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-graphql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: graphql_practica
+      MYSQL_USER: gonzales
+      MYSQL_PASSWORD: gonzales123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_graphql_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_graphql_data:
