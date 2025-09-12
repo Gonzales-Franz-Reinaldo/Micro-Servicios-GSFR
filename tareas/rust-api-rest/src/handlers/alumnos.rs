@@ -8,7 +8,7 @@ use validator::Validate;
 
 use crate::models::*;
 
-/// Obtener todos los alumnos con paginación y filtros
+/// GET /api/alumnos - Obtener alumnos con paginación y filtros
 #[utoipa::path(
     get,
     path = "/api/alumnos",
@@ -26,39 +26,47 @@ use crate::models::*;
     tag = "Alumnos"
 )]
 pub async fn get_alumnos(
-    State(pool): State<Pool<MySql>>,
-    Query(params): Query<PaginationQuery>,
+    State(pool): State<Pool<MySql>>,     
+    Query(params): Query<PaginationQuery>, // Extractor de query parameters
 ) -> Result<Json<AlumnosResponse>, (StatusCode, Json<ErrorResponse>)> {
+    // Calcular paginación con valores por defecto y límites
     let page = params.page.unwrap_or(1).max(1);
     let limit = params.limit.unwrap_or(10).min(100).max(1);
     let offset = (page - 1) * limit;
 
+    // Construir queries dinámicamente basado en filtros
     let mut query = "SELECT * FROM alumnos WHERE 1=1".to_string();
     let mut count_query = "SELECT COUNT(*) as total FROM alumnos WHERE 1=1".to_string();
     
+    // Agregar filtro de búsqueda si se proporciona
     if let Some(search) = &params.search {
         let search_condition = format!(" AND (nombre LIKE '%{}%' OR apellido LIKE '%{}%')", search, search);
         query.push_str(&search_condition);
         count_query.push_str(&search_condition);
     }
     
+    // Agregar filtro por carrera
     if let Some(carrera) = &params.carrera {
         let carrera_condition = format!(" AND carrera = '{}'", carrera);
         query.push_str(&carrera_condition);
         count_query.push_str(&carrera_condition);
     }
     
+    // Agregar filtro por estado activo
     if let Some(activo) = params.activo {
         let activo_condition = format!(" AND activo = {}", activo);
         query.push_str(&activo_condition);
         count_query.push_str(&activo_condition);
     }
 
+    // Agregar ordenamiento y paginación
     query.push_str(" ORDER BY fecha_registro DESC");
     query.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
 
+    // Ejecutar query principal para obtener alumnos
     match sqlx::query_as::<_, Alumno>(&query).fetch_all(&pool).await {
         Ok(alumnos) => {
+            // Ejecutar query de conteo para total de registros
             let total: (i64,) = sqlx::query_as(&count_query).fetch_one(&pool).await
                 .unwrap_or((0,));
 
@@ -83,57 +91,7 @@ pub async fn get_alumnos(
     }
 }
 
-/// Obtener un alumno por ID
-#[utoipa::path(
-    get,
-    path = "/api/alumnos/{id}",
-    params(
-        ("id" = i32, Path, description = "ID del alumno")
-    ),
-    responses(
-        (status = 200, description = "Alumno encontrado", body = AlumnoResponse),
-        (status = 404, description = "Alumno no encontrado", body = ErrorResponse),
-        (status = 500, description = "Error interno del servidor", body = ErrorResponse)
-    ),
-    tag = "Alumnos"
-)]
-pub async fn get_alumno(
-    State(pool): State<Pool<MySql>>,
-    Path(id): Path<i32>,  // Cambiado de String a i32
-) -> Result<Json<AlumnoResponse>, (StatusCode, Json<ErrorResponse>)> {
-    match sqlx::query_as::<_, Alumno>("SELECT * FROM alumnos WHERE id = ?")
-        .bind(id)  // Ya no necesita &id
-        .fetch_optional(&pool)
-        .await
-    {
-        Ok(Some(alumno)) => Ok(Json(AlumnoResponse {
-            success: true,
-            message: "Alumno encontrado".to_string(),
-            data: Some(alumno),
-        })),
-        Ok(None) => Err((
-            StatusCode::NOT_FOUND,
-            Json(ErrorResponse {
-                success: false,
-                message: "Alumno no encontrado".to_string(),
-                errors: None,
-            }),
-        )),
-        Err(e) => {
-            tracing::error!("Error al obtener alumno: {}", e);
-            Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(ErrorResponse {
-                    success: false,
-                    message: "Error interno del servidor".to_string(),
-                    errors: Some(vec![e.to_string()]),
-                }),
-            ))
-        }
-    }
-}
-
-/// Crear un nuevo alumno
+/// POST /api/alumnos - Crear nuevo alumno
 #[utoipa::path(
     post,
     path = "/api/alumnos",
@@ -147,10 +105,10 @@ pub async fn get_alumno(
     tag = "Alumnos"
 )]
 pub async fn create_alumno(
-    State(pool): State<Pool<MySql>>,
-    Json(payload): Json<CreateAlumnoRequest>,
+    State(pool): State<Pool<MySql>>,           // Pool 
+    Json(payload): Json<CreateAlumnoRequest>,  // Deserialización automática del JSON
 ) -> Result<Json<AlumnoResponse>, (StatusCode, Json<ErrorResponse>)> {
-    // Validar datos
+    // Validar datos usando las reglas definidas en el struct
     if let Err(errors) = payload.validate() {
         let error_messages: Vec<String> = errors
             .field_errors()
@@ -168,13 +126,16 @@ pub async fn create_alumno(
         ));
     }
 
+    // Usar valor por defecto para promedio si no se proporciona
     let promedio = payload.promedio.unwrap_or(0.0);
 
+    // Prepared statement para prevenir SQL injection
     let query = r#"
         INSERT INTO alumnos (nombre, apellido, email, edad, carrera, semestre, promedio)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     "#;
 
+    // Ejecutar insert con parámetros bindeados
     match sqlx::query(query)
         .bind(&payload.nombre)
         .bind(&payload.apellido)
@@ -182,14 +143,15 @@ pub async fn create_alumno(
         .bind(payload.edad)
         .bind(&payload.carrera)
         .bind(payload.semestre)
-        .bind(promedio)  
+        .bind(promedio)
         .execute(&pool)
         .await
     {
         Ok(result) => {
+            // Obtener ID del registro insertado
             let alumno_id = result.last_insert_id() as i32;
 
-            // Obtener el alumno creado
+            // Fetch del alumno recién creado para retornarlo
             match sqlx::query_as::<_, Alumno>("SELECT * FROM alumnos WHERE id = ?")
                 .bind(alumno_id)
                 .fetch_one(&pool)
@@ -213,6 +175,7 @@ pub async fn create_alumno(
                 }
             }
         }
+        // Manejo específico de violación de constraint único (email duplicado)
         Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => {
             Err((
                 StatusCode::CONFLICT,
@@ -237,7 +200,7 @@ pub async fn create_alumno(
     }
 }
 
-/// Actualizar un alumno
+/// PUT /api/alumnos/{id} - Actualizar alumno existente
 #[utoipa::path(
     put,
     path = "/api/alumnos/{id}",
@@ -256,10 +219,10 @@ pub async fn create_alumno(
 )]
 pub async fn update_alumno(
     State(pool): State<Pool<MySql>>,
-    Path(id): Path<i32>,
+    Path(id): Path<i32>,                      
     Json(payload): Json<UpdateAlumnoRequest>,
 ) -> Result<Json<AlumnoResponse>, (StatusCode, Json<ErrorResponse>)> {
-    // Validar datos
+    // Validar datos de entrada
     if let Err(errors) = payload.validate() {
         let error_messages: Vec<String> = errors
             .field_errors()
@@ -277,7 +240,7 @@ pub async fn update_alumno(
         ));
     }
 
-    // Verificar si el alumno existe
+    // Verificar que el alumno existe antes de actualizar
     let existing_alumno = sqlx::query_as::<_, Alumno>("SELECT * FROM alumnos WHERE id = ?")
         .bind(id)
         .fetch_optional(&pool)
@@ -308,10 +271,11 @@ pub async fn update_alumno(
         }
     }
 
-    // Construir query de actualización dinámicamente con tipos correctos
+    // Construir query UPDATE dinámicamente - solo campos proporcionados
     let mut query_builder = sqlx::QueryBuilder::new("UPDATE alumnos SET ");
     let mut has_updates = false;
 
+    // Agregar cada campo solo si está presente en el payload
     if let Some(nombre) = &payload.nombre {
         if has_updates {
             query_builder.push(", ");
@@ -368,6 +332,7 @@ pub async fn update_alumno(
         has_updates = true;
     }
     
+    // Campo activo - tipo bool se maneja correctamente
     if let Some(activo) = payload.activo {
         if has_updates {
             query_builder.push(", ");
@@ -376,6 +341,7 @@ pub async fn update_alumno(
         has_updates = true;
     }
 
+    // Validar que al menos un campo se proporcionó para actualizar
     if !has_updates {
         return Err((
             StatusCode::BAD_REQUEST,
@@ -387,10 +353,13 @@ pub async fn update_alumno(
         ));
     }
 
+    // Agregar WHERE clause
     query_builder.push(" WHERE id = ").push_bind(id);
 
+    // Ejecutar update
     match query_builder.build().execute(&pool).await {
         Ok(result) => {
+            // Verificar que se actualizó al menos una fila
             if result.rows_affected() == 0 {
                 return Err((
                     StatusCode::NOT_FOUND,
@@ -402,7 +371,7 @@ pub async fn update_alumno(
                 ));
             }
 
-            // Obtener el alumno actualizado
+            // Retornar el alumno actualizado
             match sqlx::query_as::<_, Alumno>("SELECT * FROM alumnos WHERE id = ?")
                 .bind(id)
                 .fetch_one(&pool)
@@ -426,6 +395,7 @@ pub async fn update_alumno(
                 }
             }
         }
+        // Manejo de constraint violation en updates (email duplicado)
         Err(sqlx::Error::Database(db_err)) if db_err.is_unique_violation() => {
             Err((
                 StatusCode::CONFLICT,
@@ -438,6 +408,56 @@ pub async fn update_alumno(
         }
         Err(e) => {
             tracing::error!("Error al actualizar alumno: {}", e);
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ErrorResponse {
+                    success: false,
+                    message: "Error interno del servidor".to_string(),
+                    errors: Some(vec![e.to_string()]),
+                }),
+            ))
+        }
+    }
+}
+
+/// Obtener un alumno por ID
+#[utoipa::path(
+    get,
+    path = "/api/alumnos/{id}",
+    params(
+        ("id" = i32, Path, description = "ID del alumno")
+    ),
+    responses(
+        (status = 200, description = "Alumno encontrado", body = AlumnoResponse),
+        (status = 404, description = "Alumno no encontrado", body = ErrorResponse),
+        (status = 500, description = "Error interno del servidor", body = ErrorResponse)
+    ),
+    tag = "Alumnos"
+)]
+pub async fn get_alumno(
+    State(pool): State<Pool<MySql>>,
+    Path(id): Path<i32>,  
+) -> Result<Json<AlumnoResponse>, (StatusCode, Json<ErrorResponse>)> {
+    match sqlx::query_as::<_, Alumno>("SELECT * FROM alumnos WHERE id = ?")
+        .bind(id)  
+        .fetch_optional(&pool)
+        .await
+    {
+        Ok(Some(alumno)) => Ok(Json(AlumnoResponse {
+            success: true,
+            message: "Alumno encontrado".to_string(),
+            data: Some(alumno),
+        })),
+        Ok(None) => Err((
+            StatusCode::NOT_FOUND,
+            Json(ErrorResponse {
+                success: false,
+                message: "Alumno no encontrado".to_string(),
+                errors: None,
+            }),
+        )),
+        Err(e) => {
+            tracing::error!("Error al obtener alumno: {}", e);
             Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ErrorResponse {
