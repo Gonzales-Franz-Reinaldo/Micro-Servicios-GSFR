@@ -1,0 +1,13 @@
+[package]
+name = "graphql-rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+async-graphql = { version = "7", features = ["chrono"] }
+async-graphql-actix-web = "7"
+sqlx = { version = "0.7", features = ["runtime-tokio", "mysql", "macros", "chrono"] }
+dotenvy = "0.15"
+tokio = { version = "1", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }

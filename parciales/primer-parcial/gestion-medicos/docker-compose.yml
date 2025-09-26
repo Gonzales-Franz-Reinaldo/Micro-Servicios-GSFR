@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: medico-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: gonzales123
+      MYSQL_USER: gonzales
+      MYSQL_PASSWORD: gonzales123
+      MYSQL_DATABASE: db_medicos
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: app-medicos
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_HOST: mysql
+      DATABASE_USER: gonzales
+      DATABASE_PASSWORD: gonzales123
+      DATABASE_NAME: db_medicos
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - app-network
+    command: sh -c "npx wait-port mysql:3306 && npm start"
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
