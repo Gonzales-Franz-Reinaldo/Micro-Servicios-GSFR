@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from app.database import database, compras_table
 from app.models.compra import CompraCreate, CompraPago, CompraResponse, CompraDetallada
 from app.services.eventos_client import eventos_client
+from app.services.rabbitmq_client import rabbitmq_client 
 from app.utils.logger import logger
 
 
@@ -162,19 +163,36 @@ class ComprasService:
             )
         
         # 4. Actualizar estado
+        fecha_pago = datetime.now()
         query = compras_table.update().where(
             compras_table.c.id == compra_id
         ).values(
             estado="pagado",
             metodo_pago=pago_data.metodo_pago,
-            fecha_pago=datetime.now()
+            fecha_pago=fecha_pago
         )
         
         await database.execute(query)
         
         logger.info(f"Pago confirmado para compra {compra_id} con {pago_data.metodo_pago}")
         
-        # 5. Retornar compra actualizada
+        #  5. Publicar mensaje en RabbitMQ para notificaciones
+        try:
+            mensaje = {
+                "compraId": compra_id,
+                "usuarioId": usuario_id,
+                "eventoId": compra.evento_id,
+                "cantidad": compra.cantidad,
+                "total": float(compra.total),
+                "metodoPago": pago_data.metodo_pago,
+                "fechaPago": fecha_pago.isoformat()
+            }
+            await rabbitmq_client.publicar_mensaje(mensaje)
+        except Exception as e:
+            logger.error(f"Error al publicar mensaje en RabbitMQ: {str(e)}")
+            # No fallar la operación si falla la notificación
+        
+        # 6. Retornar compra actualizada
         return await self.get_compra_by_id(compra_id)
     
     async def cancelar_compra(self, compra_id: int, usuario_id: str) -> CompraResponse:

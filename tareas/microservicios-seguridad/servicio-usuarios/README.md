@@ -16,3 +16,18 @@ Microservicio para autenticación JWT.
 - DELETE /api/v1/users/:id
 
 Prueba con Postman.
+
+
+### ADMINASTRADORES
+- Se pueden autenticar
+- Los admins pueden crear, actualizar y eliminar eventos
+- Y gestion de usuarios
+
+### USUARIOS
+- Los Usuarios pueden registrarse
+- Los usuarios pueden autenticarse para consumir los servicios
+- Los usuarios auntenticados pueden consultar los eventos disponibles
+- Los usuarios pueden realizar la Compra de entradas
+- Al comprar, se debe registrar el evento, la cantidad de entradas y el usuario que realiza la operación.
+- El usuario podrá realizar el pago de la compra específica y marcarle como pagado
+- Despues de confirmar el pago le debe llegar la notificación al correo del usuario

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     eventos_service_url: str
     usuarios_service_url: str
     
+    #  RabbitMQ
+    rabbitmq_url: str = "amqp://guest:guest@localhost:5672"
+    rabbitmq_queue: str = "notificaciones_compras"
+    
     # Logging
     log_level: str = "INFO"
     

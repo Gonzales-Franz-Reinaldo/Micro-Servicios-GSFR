@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
     // Inicializar logger
     logger::init_logger();
     
-    tracing::info!("🚀 Iniciando Servicio de Eventos...");
+    tracing::info!("Iniciando Servicio de Eventos...");
 
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL no configurada");
     let port: u16 = env::var("PORT")
@@ -26,12 +26,12 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or(3001);
 
     let pool = db::init_db(&db_url).await;
-    tracing::info!("✅ Conectado a MySQL exitosamente");
+    tracing::info!("Conectado a MySQL exitosamente");
 
     // Middleware de autenticación
     let auth_mw = HttpAuthentication::bearer(auth::validator);
 
-    tracing::info!("🌐 Servicio de eventos escuchando en http://127.0.0.1:{}", port);
+    tracing::info!("Servicio de eventos escuchando en http://127.0.0.1:{}", port);
     
     HttpServer::new(move || {
         App::new()

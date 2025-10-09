@@ -26,3 +26,6 @@ python-multipart
 
 # Validación
 email-validator
+
+# RabbitMQ
+aio-pika

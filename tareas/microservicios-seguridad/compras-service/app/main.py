@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.database import connect_db, disconnect_db
 from app.routes import compras
+from app.services.rabbitmq_client import rabbitmq_client 
 from app.utils.logger import logger
 
 
@@ -15,12 +16,14 @@ from app.utils.logger import logger
 async def lifespan(app: FastAPI):
     """Manejo del ciclo de vida de la aplicación"""
     # Startup
-    logger.info(f"🚀 Iniciando {settings.app_name} v{settings.app_version}")
+    logger.info(f"Iniciando {settings.app_name} v{settings.app_version}")
     await connect_db()
+    await rabbitmq_client.conectar()  #  Conectar a RabbitMQ
     yield
     # Shutdown
+    await rabbitmq_client.cerrar()  #  Cerrar conexión
     await disconnect_db()
-    logger.info("👋 Cerrando servicio de compras")
+    logger.info("Cerrando servicio de compras")
 
 
 # Crear aplicación

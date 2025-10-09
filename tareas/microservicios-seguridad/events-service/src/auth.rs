@@ -18,7 +18,7 @@ pub async fn validator(
     let secret = std::env::var("JWT_SECRET").unwrap_or_else(|_| "dev_secret".into());
     let token = credentials.token();
 
-    tracing::debug!("🔐 Validando token...");
+    tracing::debug!(" Validando token...");
 
     let data = decode::<Claims>(
         token,

@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const logger = require('../config/logger');
 const bcrypt = require('bcryptjs'); 
 
-// Register (público)
+// Register 
 const register = async (req, res) => {
     try {
         logger.info('Iniciando registro de usuario', { email: req.body.email });
@@ -27,7 +27,7 @@ const register = async (req, res) => {
     }
 };
 
-// Login (público)
+// Login 
 const login = async (req, res) => {
     try {
         logger.info('Iniciando login', { email: req.body.email });
@@ -63,6 +63,33 @@ const getMe = async (req, res) => {
     }
 };
 
+// Obtener usuario por ID 
+const getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        logger.info('Obteniendo usuario por ID (microservicio)', { userId: id });
+
+        const user = await User.findById(id).select('-password');
+        
+        if (!user) {
+            logger.warn('Usuario no encontrado', { userId: id });
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        if (!user.isActive) {
+            logger.warn('Usuario inactivo', { userId: id });
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        logger.info('Usuario encontrado', { userId: id, email: user.email });
+        res.status(200).json(user);
+    } catch (error) {
+        logger.error('Error al obtener usuario por ID:', error.message);
+        res.status(500).json({ message: 'Error interno' });
+    }
+};
+
+
 // List all users (admin only)
 const getAllUsers = async (req, res) => {
     try {
@@ -75,7 +102,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// Update user (self or admin)
+// Update user
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -103,7 +130,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-// Delete user (soft delete, self or admin)
+// Delete user 
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -130,6 +157,7 @@ module.exports = {
     register,
     login,
     getMe,
+    getUserById,
     getAllUsers,
     updateUser,
     deleteUser

@@ -9,11 +9,11 @@ pub async fn init_db(url: &str) -> MyPool {
         .max_connections(10)
         .connect(url)
         .await
-        .expect("❌ No se pudo conectar a MySQL. Verifica DATABASE_URL");
+        .expect(" No se pudo conectar a MySQL. Verifica DATABASE_URL");
 
     tracing::info!("Verificando tabla 'eventos'...");
 
-    // Solo crear la tabla si NO existe (sin eliminar datos)
+    // Solo crear la tabla si NO existe 
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS eventos (
@@ -33,8 +33,8 @@ pub async fn init_db(url: &str) -> MyPool {
     )
     .execute(&pool)
     .await
-    .expect("❌ No se pudo crear/verificar la tabla eventos");
+    .expect(" No se pudo crear/verificar la tabla eventos");
 
-    tracing::info!("✅ Tabla 'eventos' verificada/creada correctamente");
+    tracing::info!("Tabla 'eventos' verificada/creada correctamente");
     pool
 }
