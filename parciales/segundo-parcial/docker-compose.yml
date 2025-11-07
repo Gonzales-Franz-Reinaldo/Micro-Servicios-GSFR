@@ -1,0 +1,174 @@
+
+services:
+  # Base de datos MySQL para Autenticación
+  mysql:
+    image: mysql:latest
+    container_name: mysql-auth
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: db_usuarios
+      MYSQL_USER: gonzales
+      MYSQL_PASSWORD: gonzales123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ugonzales", "-pgonzales123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Para MongoDB para Vehículos
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-vehiculos
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: db_vehiculos
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - microservices-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/db_vehiculos -u admin -p admin123 --authenticationDatabase admin --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  #  RabbitMQ 
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   container_name: rabbitmq-broker
+  #   restart: always
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+  #     RABBITMQ_DEFAULT_VHOST: /
+  #   ports:
+  #     - "5672:5672" 
+  #     - "15672:15672" 
+  #   networks:
+  #     - microservices-network
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 20s
+
+
+
+  # Microservicio de Autenticacion
+  microservicio-auth:
+    build: 
+      context: ./microservicio-autenticacion
+      dockerfile: Dockerfile
+    container_name: microservicio-auth
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: db_usuarios
+      DB_USER: gonzales
+      DB_PASSWORD: gonzales123
+      JWT_SECRET: 80c5eb16a4570f9f2922464cb86175954971d6c8c7f5dc948703f808661c7396
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    volumes:
+      - ./microservicio-autenticacion/logs:/app/logs
+
+  # Microservicio Vehículos
+  microservicio-vehiculos:
+    build: 
+      context: ./microservicio-vehiculos
+      dockerfile: Dockerfile
+    container_name: microservicio-vehiculos
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URL: mongodb://admin:admin123@mongodb:27017/
+      MONGODB_DB_NAME: db_vehiculos
+      JWT_SECRET_KEY: 80c5eb16a4570f9f2922464cb86175954971d6c8c7f5dc948703f808661c7396
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      DEBUG: "False"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  # Microservicio Envíos 
+  # microservicio-envios:
+  #   build: 
+  #     context: ./microservicio-envios
+  #     dockerfile: Dockerfile
+  #   container_name: microservicio-envios
+  #   restart: always
+  #   ports:
+  #     - "3003:3003"
+  #   environment:
+  #     # Configuraciones de RabbitMQ 
+  #     RABBITMQ_HOST: rabbitmq
+  #     RABBITMQ_PORT: 5672
+  #     RABBITMQ_USER: user
+  #     RABBITMQ_PASS: password
+  #     JWT_SECRET: 80c5eb16a4570f9f2922464cb86175954971d6c8c7f5dc948703f808661c7396
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy 
+  #   networks:
+  #     - microservices-network
+
+
+  # NGINX - Proxy Inverso
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - microservicio-auth
+      - microservicio-vehiculos
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+# Volumenes
+volumes:
+  mysql_data:
+    driver: local
+    name: mysql_auth_data
+  mongodb_data:
+    external: true  
+    name: mongodb_vehiculos_data
+
+networks:
+  microservices-network:
+    driver: bridge
+    name: microservices_network
