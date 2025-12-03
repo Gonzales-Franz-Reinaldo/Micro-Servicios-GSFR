@@ -1,0 +1,73 @@
+// proto/universidad.proto
+syntax = "proto3";
+
+package universidad;
+
+service UniversidadService {
+  // Servicios para Estudiantes
+  rpc AgregarEstudiante(Estudiante) returns (EstudianteResponse) {};
+  rpc ListarCursosDeEstudiante(EstudianteRequest) returns (CursosList) {};
+  
+  // Servicios para Cursos
+  rpc AgregarCurso(Curso) returns (CursoResponse) {};
+  rpc ListarEstudiantesDeCurso(CursoRequest) returns (EstudiantesList) {};
+  
+  // Servicios de Inscripción
+  rpc InscribirEstudiante(InscripcionRequest) returns (InscripcionResponse) {};
+}
+
+// Mensajes para Estudiantes
+message Estudiante {
+  string ci = 1;
+  string nombres = 2;
+  string apellidos = 3;
+  string carrera = 4;
+}
+
+message EstudianteRequest {
+  string ci = 1;
+}
+
+message EstudianteResponse {
+  string ci = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+message EstudiantesList {
+  repeated Estudiante estudiantes = 1;
+  string mensaje = 2;
+}
+
+// Mensajes para Cursos
+message Curso {
+  string codigo = 1;
+  string nombre = 2;
+  string docente = 3;
+}
+
+message CursoRequest {
+  string codigo = 1;
+}
+
+message CursoResponse {
+  string codigo = 1;
+  string mensaje = 2;
+  bool exito = 3;
+}
+
+message CursosList {
+  repeated Curso cursos = 1;
+  string mensaje = 2;
+}
+
+// Mensajes para Inscripciones
+message InscripcionRequest {
+  string ci_estudiante = 1;
+  string codigo_curso = 2;
+}
+
+message InscripcionResponse {
+  string mensaje = 1;
+  bool exito = 2;
+}
